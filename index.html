@@ -10,6 +10,7 @@
             height: 100%;
             margin: 0;
         }
+
         body {
             background-color: #b1efff;
             color: #355987;
@@ -30,8 +31,8 @@
             margin: 0.5em 0;
         }
 
-        @media (max-width: 767px) {
-            body  {
+        @media (max-width: 767px), (max-height: 600px) {
+            body {
                 font-size: 24px;
             }
 
@@ -48,27 +49,50 @@
     </style>
 </head>
 <body>
+<div id="app">
     <h1>Knut</h1>
-    <p><span id="years">...</span> years</p>
-    <p><span id="months">...</span> months</p>
-    <p><span id="weeks">...</span> weeks</p>
-    <p><span id="days">...</span> days</p>
-    <p><span id="hours">...</span> hours</p>
-    <p><span id="minutes">...</span> minutes</p>
-    <p><span id="seconds">...</span> seconds</p>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/locale/sv.js"></script>
-    <script>
+    <p><span id="years">{{ years }}</span> years</p>
+    <p><span id="months">{{ months }}</span> months</p>
+    <p><span id="weeks">{{ weeks }}</span> weeks</p>
+    <p><span id="days">{{ days }}</span> days</p>
+    <p><span id="hours">{{ hours }}</span> hours</p>
+    <p><span id="minutes">{{ minutes }}</span> minutes</p>
+    <p><span id="seconds">{{ seconds }}</span> seconds</p>
+</div>
 
-        var birth = moment("2015-08-28 07:20");
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/locale/sv.js"></script>
+<script>
 
-        setInterval(function() {
-            var now = moment();
-            ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'].forEach(function(period) {
-                document.getElementById(period).innerHTML = now.diff(birth, period).toLocaleString();
-            });
-        }, 1000);
+    var birth = moment("2015-08-28 07:20");
 
-    </script>
+    function diff(period) {
+        return function() {
+            return this.now.diff(birth, period, period != 'seconds').toLocaleString();
+        }
+    }
+
+    var v = new Vue({
+        el: "#app",
+        data: {
+            now: moment()
+        },
+        computed: {
+            years: diff('years'),
+            months: diff('months'),
+            weeks: diff('weeks'),
+            days: diff('days'),
+            hours: diff('hours'),
+            minutes: diff('minutes'),
+            seconds: diff('seconds')
+        }
+    });
+
+    setInterval(function() {
+        v.now = moment();
+    }, 1000);
+
+</script>
 </body>
 </html>
